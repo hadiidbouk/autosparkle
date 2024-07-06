@@ -1,0 +1,46 @@
+# Write a CD workflow to build and distribute the gem, it should trigger only manually and has an input for the method on how to bump the version
+
+name: "CD"
+on:
+  workflow_dispatch:
+    inputs:
+      method:
+        type: choice
+        description: "Method to bump the version"
+        required: true
+        default: "patch"
+        options:
+          - "major"
+          - "minor"
+          - "patch"
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3.1'
+    - name: Install Bundler
+      run: gem install bundler
+    - name: Install dependencies
+      run: bundle install
+    - name: Bump version
+      run: rake bump_version METHOD=${{ github.event.inputs.method }}
+    - name: Build Gem
+      run: rake build
+    - name: Publish Gem
+      env:
+        GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
+      run: rake publish_gem
+    - name: Release new version on GitHub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        rake package
+        rake release_package
+    - name: Push new version to the repository
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: rake push_version
