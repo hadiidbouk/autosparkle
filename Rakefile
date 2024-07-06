@@ -88,7 +88,8 @@ task :push_version do
   system 'git config --global user.name "Hadi Dbouk"'
 
   # Push the changes to the develop branch
-  system 'git checkout main'
+  system 'git pull origin develop'
+  system 'git checkout develop'
   system 'git add autosparkle.gemspec'
   system "git commit -m 'Bump version to #{retrieve_gem_version}'"
   system 'git push origin develop'
