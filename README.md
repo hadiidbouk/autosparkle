@@ -1,4 +1,6 @@
 # autosparkle
+![GitHub Release](https://img.shields.io/github/v/release/hadiidbouk/autosparkle?style=flat&label=version)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/hadiidbouk/autosparkle/ci.yml)
 
 ![autosparkle main image](resources/readme-main-image.jpg)
 
