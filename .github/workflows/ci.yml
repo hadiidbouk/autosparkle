@@ -1,0 +1,26 @@
+name: "Ruby CI"
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3.1'
+    - name: Check Syntax
+      run: rake syntax
+    - name: Run tests
+      run: rake test
+    - name: Build Gem
+      run: rake build
+    - name: Install Gem
+      run: rake install
