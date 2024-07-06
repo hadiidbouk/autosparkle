@@ -63,6 +63,3 @@ Metrics/PerceivedComplexity:
 
 Gemspec/OrderedDependencies:
   Enabled: true
-
-Gemspec/DevelopmentDependencies:
-  Enabled: false
