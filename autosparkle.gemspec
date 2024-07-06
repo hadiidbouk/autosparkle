@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.metadata['changelog_uri'] = "#{spec.homepage}/blob/main/CHANGELOG.md"
 
   spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rspec'
 
   spec.add_runtime_dependency 'aws-sdk-s3', '~> 1.152.3'
   spec.add_runtime_dependency 'colorize', '~> 1.1.0'
