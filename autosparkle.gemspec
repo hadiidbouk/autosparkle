@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name                   = 'autosparkle'
-  spec.version                = '0.0.6'
+  spec.version                = '0.0.7'
   spec.authors                = ['Hadi Dbouk']
   spec.email                  = ['hadiidbouk@gmail.com']
   spec.summary                = 'Automate macOS app delivery outside the App Store'
