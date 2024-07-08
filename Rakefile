@@ -3,17 +3,13 @@
 require 'English'
 require 'rake/testtask'
 require 'rake/packagetask'
+require_relative 'lib/autosparkle/metadata'
 
 ############# Common #############
 desc 'Build the gem'
 task :build do
   system 'gem build autosparkle.gemspec'
   raise 'Gem build failed' unless $CHILD_STATUS.success?
-end
-
-def retrieve_gem_version
-  gemspec_content = File.read('autosparkle.gemspec')
-  gemspec_content.match(/spec\.version\s*=\s*['"]([^'"]+)['"]/)[1]
 end
 
 ############# CI #############
@@ -45,14 +41,11 @@ task :bump_version do
   method = ENV.fetch('METHOD', nil)
   raise 'You must specify the method (major, minor, patch)' unless method
 
-  # Read the gemspec file
-  gemspec_file = 'autosparkle.gemspec'
-  gemspec_content = File.read(gemspec_file)
+  metadata_file_path = 'lib/autosparkle/metadata.rb'
+  metadata_content = File.read(metadata_file_path)
 
   new_version = nil
-
-  # Update the version line
-  new_gemspec_content = gemspec_content.gsub(/(spec\.version\s*=\s*['"])([^'"]+)(['"])/) do
+  new_metadata_content = metadata_content.gsub(/(VERSION = ')([^']+)(')/) do
     prefix = Regexp.last_match(1)
     current_version = Regexp.last_match(2)
     suffix = Regexp.last_match(3)
@@ -75,10 +68,9 @@ task :bump_version do
     "#{prefix}#{new_version}#{suffix}"
   end
 
-  # Write the updated content back to the file
-  File.write(gemspec_file, new_gemspec_content)
+  File.write(metadata_file_path, new_metadata_content)
 
-  puts "Bumped version to #{new_version}"
+  puts "Version updated to #{new_version}"
 end
 
 desc 'Push the new version to the repository'
@@ -91,7 +83,7 @@ task :push_version do
   system 'git pull origin develop'
   system 'git checkout develop'
   system 'git add autosparkle.gemspec'
-  system "git commit -m 'Bump version to #{retrieve_gem_version}'"
+  system "git commit -m 'Bump version to #{Autosparkle::VERSION}'"
   system 'git push origin develop'
 
   # Retreive the last commit hash
