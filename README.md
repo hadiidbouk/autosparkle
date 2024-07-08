@@ -61,13 +61,50 @@ autosparkle is a Ruby command line tool that automates the delivery of your macO
    ```bash
    git clone https://github.com/hadiidbouk/autosparkle.git
    ```
-2. Call the `autosparkle.rb` script from the repository, you need to specify your Xcode project path and your environment file. Here's how you can do it:
-    ```bash
-    ruby autosparkle.rb --project-path <<YOUR XCODE PROJECT>> --env <<YOUR ENV NAME>>
-    ```
+2. Execute the Ruby script `autosparkle.rb`, check the [Usage](#usage) section below.
 
-    You can also pass your workspace path using `--workspace-path` and specify the environment path using `--env-file`.
+## Usage
 
+There are two ways to utilize autosparkle. The first option is to automate the entire process by using the `automate` command. Alternatively, you can select any of the following commands (`export`, `package`, `distribute`) and build your own solution around them.
+
+
+All of these commands require you to provide the environment file or its name. If you use the `automate` command or the `export` command, which require a project/workspace path, you can simply pass the environment name to the `--env` option. autosparkle will then search for a file named `.env.autosparkle.<<YOUR_ENV_NAME>>` in your project directory (where your Xcode project/workspace is located). For example, if you pass `--env local`, autosparkle will search for `.env.autosparkle.local`.
+
+It is **recommended** to use the `automate` command for several reasons:
+
+1. It automatically handles the app versioning, ensuring consistency between the Info.plist and the `appcast.xml`.
+
+2. The custom keychain is created once for all the signing steps.
+
+3. All the generated files are conveniently located in one place at `~/Library/Developer/autosparkle/build`. When using the commands separately, each command will override any existing files in the build directory.
+
+
+
+You can explore the functionality of each command by using the `--help` flag. For instance: 
+```bash 
+autosparkle distribute --help
+```
+
+Output:
+```bash
+distribute
+
+  Usage: autosparkle distribute [options]
+
+  Distribute your package to the specified storage and update the appcast.xml file
+
+  Options:
+    --dmg-path PATH      Path of the DMG file to be distributed
+    --app-display-name NAME Name of the app inside the DMG without the .app extension
+    --marketing-version VERSION Marketing version of the app
+    --current-project-version VERSION Current project version of the app
+    --minimum-macos-version VERSION Minimum macOS version required to run the app, defaults to 14.0
+```
+
+
+> **Note:**
+>
+> When using the **distribute** command, autosparkle will automatically calculate the new marketing version and the current project version from the uploaded appcast file (if it exists). If you want to override these values, make sure to pass them using the `--marketing-version` and `--current-project-version` options. Additionally, make sure to set them in your app's Info.plist before exporting the app.
 
 ## Environment
 autosparkle utilizes the [dotenv](https://github.com/bkeepers/dotenv) gem to manage environment variables.
@@ -91,7 +128,7 @@ Below are the list of environment variables used by autosparkle:
 | APP_SPECIFIC_PASSWORD | The App specific password that will be used in the notarize step | Yes | |
 | DEVELOPER_ID_APPLICATION_BASE64 | The Developer ID Application base64 certificate | Yes | |
 | DEVELOPER_ID_APPLICATION_PASSWORD | The Developer ID Application base64 certificate password | Yes | |
-| DMG_BACKGROUND_IMAGE | The DMG background image path that should exist in the project folder | Yes | |
+| DMG_BACKGROUND_IMAGE | The path to the DMG background image. Make sure to use an image with the same width and height as the window to ensure a proper fit. | No | [View it here](lib/autosparkle/resources/default-dmg-background.png) |
 | DMG_WINDOW_WIDTH | The DMG "Drag to Applications" window width | Yes | |
 | DMG_WINDOW_HEIGHT | The DMG "Drag to Applications" window height | Yes | |
 | DMG_ICON_SIZE | The icon size of the app and the Applications folder in the window | Yes | |

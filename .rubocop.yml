@@ -9,6 +9,9 @@ Style/FrozenStringLiteralComment:
 Style/HashSyntax:
   Enabled: true
 
+Metrics/BlockLength:
+  Enabled: false
+
 Style/MethodDefParentheses:
   Enabled: true
 

@@ -6,8 +6,9 @@ require_relative 'base_environment_variables'
 
 # A class to load the default environment variables
 class DefaultEnvironmentVariables < BaseEnvironmentVariables
-  def initialize(project_directory_path)
+  def initialize
     super({
+      env_file_path: 'ENV_FILE_PATH',
       project_directory_path: 'PROJECT_DIRECTORY_PATH',
       scheme: 'SCHEME',
       configuration: 'CONFIGURATION',
@@ -29,7 +30,5 @@ class DefaultEnvironmentVariables < BaseEnvironmentVariables
       dmg_window_width: 'DMG_WINDOW_WIDTH',
       dmg_window_height: 'DMG_WINDOW_HEIGHT'
     })
-
-    ENV['PROJECT_DIRECTORY_PATH'] = project_directory_path
   end
 end
