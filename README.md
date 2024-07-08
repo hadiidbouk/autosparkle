@@ -10,6 +10,7 @@ With autosparkle, you no longer have to worry about these steps anymore.
 
 ## Table of Contents
 - [Introduction](#introduction)
+- [Usage](#usage)
 - [Features](#features)
 - [Installation](#installation)
 - [Environment](#environment)
@@ -111,8 +112,6 @@ autosparkle utilizes the [dotenv](https://github.com/bkeepers/dotenv) gem to man
 
 The purpose of using environment variable files is to facilitate the transition between the local environment on your personal machine and the production environment on your continuous delivery machine.
 
-When you specify the environment name using the `--env` command, autosparkle will search for autosparkle environment files *(e.g., .env.autosparkle.local, .env.autosparkle.production)* in your project directory.
-
 Remember to add your local environment file to the *.gitignore* file and remove any sensitive data from your production environment file. Instead, replace them with the environment variables provided by your continuous delivery system like this:
 ```
 APP_SEPECIFIC_PASSWORD=$APP_SPECIFIC_PASSWORD
@@ -163,12 +162,10 @@ Here are some future enhancements planned for autosparkle:
 
 - Support binary delta updates.
 - Support for additional storage options.
-- Introduce the ability to package the app without distributing it.
 - Support for the `pkg` format.
 - Distributing autosparkle using Homebrew.
 
 Stay tuned for these exciting updates!
-
 
 
 ## Contributing
