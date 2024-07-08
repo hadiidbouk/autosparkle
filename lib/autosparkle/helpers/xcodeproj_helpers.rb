@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'colorize'
 require 'xcodeproj'
 require 'plist'
@@ -54,7 +56,7 @@ module Xcodeproj
       end
     end
 
-    raise "Target not found for scheme #{Env.variables.scheme_name}".red unless target
+    raise "Target not found for scheme #{Env.variables.scheme}".red unless target
 
     [project, target]
   end

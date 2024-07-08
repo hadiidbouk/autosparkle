@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'xcodeproj'
 require_relative 'build_directory_helpers'
 require_relative 'puts_helpers'
 require_relative '../environment/environment'
@@ -9,9 +10,10 @@ require_relative '../environment/environment'
 module DMG
   def self.create(app_path)
     volume_name = Env.variables.app_display_name
-    background_image_path = "#{Env.variables.project_directory_path}/#{Env.variables.dmg_background_image}"
 
-    dmg_path = create_blank_dmg(app_path, background_image_path, volume_name)
+    background_image_path = dmg_background_image_path
+    volume_size = calculate_volume_size(app_path, background_image_path)
+    dmg_path = create_blank_dmg(volume_size, volume_name)
     mount(dmg_path, volume_name)
     copy_app_and_set_symbolic_link(app_path, volume_name)
     copy_background_image(background_image_path, volume_name)
@@ -20,16 +22,32 @@ module DMG
     create_read_only_dmg(dmg_path)
   end
 
-  def self.create_blank_dmg(app_path, background_image_path, volume_name)
+  def self.dmg_background_image_path
+    background_image_path = Env.variables.dmg_background_image
+    final_background_image_path = if background_image_path.start_with?('~')
+                                    File.expand_path(background_image_path)
+                                  elsif background_image_path.start_with?('/')
+                                    background_image_path
+                                  else
+                                    File.expand_path(background_image_path, Env.variables.env_file_path)
+                                  end
+
+    raise 'DMG background image not found' unless !background_image_path || File.exist?(final_background_image_path)
+
+    default_dmg_background_path = File.join(File.dirname(__dir__), 'resources', 'default-dmg-background.png')
+    final_background_image_path ||= default_dmg_background_path
+    final_background_image_path
+  end
+
+  def self.create_blank_dmg(volume_size, volume_name)
     puts_if_verbose 'Creating a blank DMG...'
-    volume_size = volume_size(app_path, background_image_path)
     uuid = `uuidgen`.strip
     dmg_path = BuildDirectory.new_path("#{Env.variables.app_display_name}-#{uuid}.dmg")
     execute_command("hdiutil create -size #{volume_size}m -fs HFS+ -volname '#{volume_name}' -ov '#{dmg_path}'")
     dmg_path
   end
 
-  def self.volume_size(app_path, background_image_path)
+  def self.calculate_volume_size(app_path, background_image_path)
     app_size_kb = `du -sk "#{app_path}"`.split("\t").first.to_i
     background_size_kb = File.size(background_image_path) / 1024
     buffer_size_kb = 20 * 1024
@@ -51,7 +69,10 @@ module DMG
   def self.copy_background_image(background_image_path, volume_name)
     puts_if_verbose 'Copying the background image to the DMG...'
     FileUtils.mkdir_p("/Volumes/#{volume_name}/.background")
-    FileUtils.cp(background_image_path, "/Volumes/#{volume_name}/.background/")
+
+    background_image_extension = File.extname(background_image_path)
+    FileUtils.cp(background_image_path,
+                 "/Volumes/#{volume_name}/.background/dmg-background#{background_image_extension}")
   end
 
   def self.customize_dmg_appearence(volume_name)
@@ -78,7 +99,7 @@ module DMG
             set the bounds of container window to {0, 0, #{window_width}, #{window_height}}
             set arrangement of icon view options of container window to not arranged
             set icon size of icon view options of container window to #{Env.variables.dmg_icon_size}
-            set background picture of icon view options of container window to file ".background:#{Env.variables.dmg_background_image}"
+            set background picture of icon view options of container window to file ".background:dmg-background.png"
             set position of item "#{Env.variables.app_display_name}.app" of container window to {#{app_x_position}, #{item_y_position}}
             set position of item "Applications" of container window to {#{applications_x_position}, #{item_y_position}}
           close
