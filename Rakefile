@@ -83,7 +83,7 @@ task :push_version do
   system 'git pull origin develop'
   system 'git checkout develop'
   system 'git add autosparkle.gemspec'
-  system "git commit -m 'Bump version to #{Autosparkle::VERSION}'"
+  system "git commit -m 'Bump version to #{AutoSparkle::VERSION}'"
   system 'git push origin develop'
 
   # Retreive the last commit hash
